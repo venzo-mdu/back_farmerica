@@ -60,12 +60,12 @@ class _SavedAddressState extends BasePageState<SavedAddress> {
                 // onPressed: press,
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.person,
                       color: Colors.redAccent,
                       size: 22,
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     Expanded(
                         child: TextFormField(
                           controller: firstName,
@@ -83,7 +83,7 @@ class _SavedAddressState extends BasePageState<SavedAddress> {
                           // },
                           decoration: InputDecoration(
                               hintText: " First Name: ${customer.firstName}",
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
                                 // fontWeight: FontWeight.bold

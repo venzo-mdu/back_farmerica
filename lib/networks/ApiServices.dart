@@ -9,6 +9,8 @@ import 'package:farmerica/models/Login.dart';
 import 'package:farmerica/models/Order.dart';
 import 'package:farmerica/models/ParentCategory.dart';
 import 'package:farmerica/models/Products.dart';
+import 'package:farmerica/models/bundledProduct.dart';
+import 'package:farmerica/models/coupon.dart';
 
 import 'package:farmerica/networks/Authorization.dart';
 import 'package:farmerica/models/TokenResponse.dart';
@@ -105,21 +107,13 @@ class Api_Services {
 
   Future getUsernameByMail(String mail) async {
     var url = "${Config.urlfor}${Config.customerUrl}?email=$mail";
-    // var url = "${Config.customerUrl}" "customers?email=$mail";
-    // print('getUsernameByMail: $url');
     String username;
     var response = await api.getAsync(url);
-    // print(response);
     if (response.length == 0) {
-      // print("invalid");
       username = null;
     } else {
-      // print("valid");
-      // print('response: ${response[0]}');
-      // Customers customer = Customers.fromJson(response[0]);
       Customers customer = Customers.fromJson(response[0]);
       print('username: ${customer.firstName}');
-      // print('username: ${customer.username}');
       username = customer.username;
     }
     return username;
@@ -132,8 +126,15 @@ class Api_Services {
       Uri.parse(url),
       body: {"username": username, "password": password},
     );
+    print('response: ${response.body}');
+    if(response.statusCode == 403) {
+      print('wrong password');
+      return response.statusCode;
+    }
     TokenResponses data = TokenResponses.fromJson(jsonDecode(response.body));
     print('data: ${data.token}');
+    print('password: ${password}');
+    print('password: ${password}');
     return data;
     // return data.token;
   }
@@ -185,14 +186,45 @@ class Api_Services {
   }
 
   Future getProductsById(int id) async {
-    var url = "${Config.url}" "${Config.urlfor}" "${Config.productUrl}/$id";
+    var url = "${Config.urlfor}" "${Config.productUrl}/$id";
     // print('getProductsById: $url');
     var response = await api.getAsync(url);
 
     Product product = Product.fromJson(response);
-    // print(product);
+    // print('productsByID: ${product.name}');
     return product;
   }
+
+
+  Future<List<BundledProduct>> getBundled(int id) async {
+    var url = "${Config.urlfor}" "${Config.productUrl}/$id?consumer_key=ck_eedc4b30808be5c1110691e5b29f16280ebd3b72&consumer_secret=cs_2313913bc74d5e096c91d308745b50afee52e61c";
+    // print('getCoupon: $url');
+    var response = await api.getAsync(url);
+    List<BundledProduct> bundledList = [];
+    if(response is List){
+      for (var item in response) {
+        bundledList.add(BundledProduct.fromJson(item));
+      }
+    }
+
+    print('bundledList: $bundledList');
+    return bundledList;
+  }
+
+
+  Future<List<Coupon>> getCoupon() async {
+    var url = "${Config.urlfor}" "${Config.coupons}?consumer_key=ck_eedc4b30808be5c1110691e5b29f16280ebd3b72&consumer_secret=cs_2313913bc74d5e096c91d308745b50afee52e61c";
+    // print('getCoupon: $url');
+
+
+    var response = await api.getAsync(url);
+    List<Coupon> couponList = [];
+    for (var item in response) {
+      couponList.add(Coupon.fromJson(item));
+    }
+    return couponList;
+  }
+
 
   Future<List<ParentCategory>> getCategory(int parentId) async {
     var url = "${Config.urlfor}" "${Config.categoriesUrl}/$parentId";
@@ -225,7 +257,7 @@ class Api_Services {
         productList.add(Product.fromJson(item));
       }
     }
-    // print('productList: ${productList.toList().toString()}');
+    //print('productList: ${productList[0].name}');
     return productList;
   }
 
@@ -523,12 +555,18 @@ class Api_Services {
     String gift_from,
     String gift_message,
     List<CartProducts> cartProducts,
+    List<Coupon> coupon_lines,
+    String coupon,
 
 
   }) async {
     final productsData = cartProducts.map((product) => {
       'product_id': product.product_id,
       'quantity': product.quantity, }).toList();
+
+    // final couponData = coupon_lines.map((coupon) => {
+    //   'coupon': coupon.code,
+    //   'amount': coupon.amount, }).toList();
 
     print('Prod Qty: ${cartProducts}');
     var url = Uri.parse(
@@ -577,8 +615,14 @@ class Api_Services {
         {"key": "gift_from", "value": gift_from},
         {"key": "gift_message", "value": gift_message}
       ],
+      'coupon_lines': [
+        {
+          "code": coupon.toString(),
+        }
+      ]
     };
 
+    print('objectCoupon: $coupon');
 
     final request = await client.postUrl(url);
     request.headers.set("Content-Type", "application/json; charset=utf-8");

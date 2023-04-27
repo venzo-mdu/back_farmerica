@@ -9,6 +9,7 @@ class Config {
   static String parentforCategory = "?parent=";
   static String productUrl = "products";
   static String urlfor = "/wp-json/wc/v3/";
+  static String coupons = "coupons";
   static String emailurl = "/wc-api/v3/customers/email/";
   static String todayOfferTagId = "46";
   static String topSellingProductTagId = "46";

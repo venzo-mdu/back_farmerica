@@ -25,6 +25,7 @@ class VerifyAddress extends BasePage {
   var shippingMode;
   final String deliveryDate;
   final String deliveryTime;
+  String couponSelection;
 
   List<CartProducts> cartProducts;
 
@@ -47,7 +48,9 @@ class VerifyAddress extends BasePage {
       this.deliveryTime,
       this.giftMsg,
       this.giftFrom,
-      this.shippingMode});
+      this.shippingMode,
+      this.couponSelection,
+      });
   @override
   _VerifyAddressState createState() => _VerifyAddressState();
 }
@@ -315,6 +318,7 @@ class _VerifyAddressState extends BasePageState<VerifyAddress> {
                           giftMsg: widget.giftMsg,
                           mobile: widget.mobile,
                           product: widget.product,
+                          couponSelection: widget.couponSelection,
                         ));
                     Navigator.push(
                         context,

@@ -1,6 +1,7 @@
 library globals;
 
 int globalInt = 45;
+int cartCount;
 
 // class GlobalCategoryId {
 //   int catetoryID = 45;

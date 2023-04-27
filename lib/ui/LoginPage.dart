@@ -1,4 +1,5 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:farmerica/ui/Welcome.dart';
 import 'package:farmerica/ui/widgets/input_outline_button.dart';
 import 'package:farmerica/ui/widgets/input_text_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -100,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return 'Please enter the passcode';
                           }
                           if (value.length <= 6) {
                             return "Password must be more than 10 letters";
@@ -148,8 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                         title: "Sign In",
                         onClick: () async {
                           if (_formKey.currentState.validate()) {
-                            username =
-                                await api_services.getUsernameByMail(mail);
+                            username = await api_services.getUsernameByMail(mail);
                             if (username == null) {
                               Fluttertoast.showToast(
                                   msg: "E-Mail is not registered",
@@ -162,7 +162,17 @@ class _LoginPageState extends State<LoginPage> {
                             } else {
                               var token = await api_services.getToken(
                                   username, password);
-                              if (token == null) {
+                              print('tokenResponse: $token');
+                              if (token == 403) {
+                                Fluttertoast.showToast(
+                                    msg: "Wrong Password",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.black,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0);
+                              } else if (token == null) {
                                 Fluttertoast.showToast(
                                     msg: "Wrong Credential",
                                     toastLength: Toast.LENGTH_SHORT,
@@ -201,7 +211,8 @@ class _LoginPageState extends State<LoginPage> {
                       InputOutlineButton(
                         title: "Back",
                         onClick: () {
-                          // Navigator.of(context).pop();
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => WelcomePage()));
                         },
                       ),
                       const Spacer(

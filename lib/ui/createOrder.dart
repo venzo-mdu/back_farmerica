@@ -18,12 +18,15 @@ class CreateOrder extends BasePage {
   final int id;
   var shippingFee;
   var details;
-  CreateOrder(
-      {this.cartProducts,
-      this.product,
-      this.id,
-      this.shippingFee,
-      this.details});
+  var couponSelection;
+  CreateOrder({
+    this.cartProducts,
+    this.product,
+    this.id,
+    this.shippingFee,
+    this.details,
+    this.couponSelection,
+  });
   @override
   _CreateOrderState createState() => _CreateOrderState();
 }
@@ -31,19 +34,7 @@ class CreateOrder extends BasePage {
 class _CreateOrderState extends BasePageState<CreateOrder> {
   final _formKey = GlobalKey<FormState>();
   Customers details;
-  String first,
-      last,
-      city,
-      state = 'Odisha',
-      postcode,
-      apartmnt,
-      flat,
-      address,
-      country = 'India',
-      mobile,
-      mail,
-      giftFrom,
-      giftMsg;
+  String first, last, city, state = 'Odisha', postcode, apartmnt, flat, address, country = 'India', mobile, mail, giftFrom, giftMsg;
   int selected = 2;
   String title = "Create Order";
   String dropDownValue;
@@ -107,6 +98,7 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
     emailId = widget.details.email;
     // phoneNumber = widget.details.billing.phone;
     print('Test: ${widget.shippingFee}');
+    print('Name: $firstName');
     getUserData();
     print('getUserData(): ${getUserData()}');
   }
@@ -145,40 +137,39 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                       hintText: DateFormat.yMd().format(DateTime.now()),
                     ),
                     onChanged: (value) async {},
-                    // validator: (value) {
-                    //   if (value == null) {
-                    //     return "Select the Delivery Date";
-                    //   }
-                    //   return null;
-                    // },
                     onTap: () async {
                       DateTime now = DateTime.now();
-                      DateTime timeLimit =
-                          DateTime(now.year, now.month, now.day, 17, 0);
+                      DateTime timeLimit = DateTime(now.year, now.month, now.day, 17, 0);
 
                       if (widget.shippingFee == 200) {
                         selectedDate = intialdate ?? DateTime.now();
 
+                        final midNightTime = DateTime(now.year, now.month, now.day, 23, 00);
+                        final currentDateTime = DateTime.now();
+                        bool changeDate = true;
+
+                        if (currentDateTime.isAfter(midNightTime)) {
+                          print(currentDateTime.isAfter(midNightTime));
+                          changeDate = false;
+                        }
+
                         final DateTime picked = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            initialDatePickerMode: DatePickerMode.day,
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101));
+                          context: context,
+                          initialDate: changeDate ? selectedDate : selectedDate.add(const Duration(days: 1)),
+                          initialDatePickerMode: DatePickerMode.day,
+                          firstDate: changeDate ? selectedDate : selectedDate.add(const Duration(days: 1)),
+                          lastDate: DateTime(2101),
+                        );
 
                         if (picked != null && picked != selectedDate) {
                           selectedDate = picked;
-                          isCurrentDaySelected =
-                              selectedDate.year == DateTime.now().year &&
-                                  selectedDate.month == DateTime.now().month &&
-                                  selectedDate.day == DateTime.now().day;
+                          isCurrentDaySelected = selectedDate.year == DateTime.now().year && selectedDate.month == DateTime.now().month && selectedDate.day == DateTime.now().day;
                           if (isCurrentDaySelected == true) {
                             print(DateTime.now());
 
                             if (intialdate.isAfter(timeLimit)) {
                               Fluttertoast.showToast(
-                                  msg:
-                                      "Please order before 5PM to deliver the product in same day midnight. Kindly change the date.",
+                                  msg: "Please order before 5PM to deliver the product in same day midnight. Kindly change the date.",
                                   toastLength: Toast.LENGTH_SHORT,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIosWeb: 3,
@@ -190,33 +181,37 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                         }
                         if (picked != null) {
                           setState(() {
-                            datePickerController.text =
-                                DateFormat.yMd().format(picked);
+                            datePickerController.text = DateFormat.yMd().format(picked);
                           });
                         }
                       } else if (widget.shippingFee == 75) {
+                        final earlyTime = DateTime(now.year, now.month, now.day, 06, 30);
+                        final currentDateTime = DateTime.now();
+                        bool changeDate = true;
+
+                        if (currentDateTime.isAfter(earlyTime)) {
+                          print(currentDateTime.isAfter(earlyTime));
+                          changeDate = false;
+                        }
+
                         selectedDate = intialdate ?? DateTime.now();
                         final DateTime picked = await showDatePicker(
-                            context: context,
-                            initialDate: selectedDate,
-                            initialDatePickerMode: DatePickerMode.day,
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2101));
+                          context: context,
+                          initialDate: changeDate ? selectedDate : selectedDate.add(const Duration(days: 1)),
+                          initialDatePickerMode: DatePickerMode.day,
+                          firstDate: changeDate ? selectedDate : selectedDate.add(const Duration(days: 1)),
+                          lastDate: DateTime(2101),
+                        );
 
                         if (picked != null && picked != selectedDate) {
                           selectedDate = picked;
-                          isCurrentDaySelected =
-                              selectedDate.year == DateTime.now().year &&
-                                  selectedDate.month == DateTime.now().month &&
-                                  selectedDate.day == DateTime.now().day;
+                          isCurrentDaySelected = selectedDate.year == DateTime.now().year && selectedDate.month == DateTime.now().month && selectedDate.day == DateTime.now().day;
                           if (isCurrentDaySelected == true) {
                             print(DateTime.now());
-                            DateTime timeLimit =
-                                DateTime(now.year, now.month, now.day, 17, 0);
+                            DateTime timeLimit = DateTime(now.year, now.month, now.day, 17, 0);
                             if (intialdate.isAfter(timeLimit)) {
                               Fluttertoast.showToast(
-                                  msg:
-                                      "Early morning delivery is not available for today. Kindly change the date",
+                                  msg: "Early morning delivery is not available for today. Kindly change the date",
                                   toastLength: Toast.LENGTH_SHORT,
                                   gravity: ToastGravity.BOTTOM,
                                   timeInSecForIosWeb: 3,
@@ -228,11 +223,19 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                         }
                         if (picked != null) {
                           setState(() {
-                            datePickerController.text =
-                                DateFormat.yMd().format(picked);
+                            datePickerController.text = DateFormat.yMd().format(picked);
                           });
                         }
                       } else if (widget.shippingFee == 0) {
+                        final freeTime = DateTime(now.year, now.month, now.day, 24, 00);
+                        final currentDateTime = DateTime.now();
+                        bool changeDate = true;
+
+                        if (currentDateTime.isAfter(freeTime)) {
+                          print(currentDateTime.isAfter(freeTime));
+                          changeDate = false;
+                        }
+
                         DateTime picked = await showDatePicker(
                           context: context,
                           initialDate: intialdate,
@@ -243,34 +246,25 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                         // String datetime = DateFormat('H').format(DateTime.now());
                         print('objectPicked: ${picked}');
 
-                        DateTime timeLimit13 =
-                            DateTime(now.year, now.month, now.day, 13, 0);
-                        DateTime timeLimit08 =
-                            DateTime(now.year, now.month, now.day, 08, 0);
-                        DateTime timeLimit18 =
-                            DateTime(now.year, now.month, now.day, 18, 0);
+                        DateTime timeLimit13 = DateTime(now.year, now.month, now.day, 13, 0);
+                        DateTime timeLimit08 = DateTime(now.year, now.month, now.day, 08, 0);
+                        DateTime timeLimit18 = DateTime(now.year, now.month, now.day, 18, 0);
 
-                        DateTime timeLimit21 =
-                            DateTime(now.year, now.month, now.day, 21, 0);
+                        DateTime timeLimit21 = DateTime(now.year, now.month, now.day, 21, 0);
                         final today = DateTime(now.year, now.month, now.day);
-                        final pickedDay =
-                            DateTime(picked.year, picked.month, picked.day);
+                        final pickedDay = DateTime(picked.year, picked.month, picked.day);
 
                         timeDropDownValues = List.from(timeDropDownValuesT);
-                        if (intialdate.isAfter(timeLimit08) &&
-                            pickedDay == today) {
+                        if (intialdate.isAfter(timeLimit08) && pickedDay == today) {
                           timeDropDownValues.remove('08:00 AM - 01:00 PM');
                         }
-                        if (intialdate.isAfter(timeLimit13) &&
-                            pickedDay == today) {
+                        if (intialdate.isAfter(timeLimit13) && pickedDay == today) {
                           timeDropDownValues.remove('01:00 PM - 06:00 PM');
                         }
-                        if (intialdate.isAfter(timeLimit18) &&
-                            pickedDay == today) {
+                        if (intialdate.isAfter(timeLimit18) && pickedDay == today) {
                           timeDropDownValues.remove('06:00 PM - 09:00 PM');
                         }
-                        if (intialdate.isAfter(timeLimit21) &&
-                            pickedDay == today) {
+                        if (intialdate.isAfter(timeLimit21) && pickedDay == today) {
                           showTime = false;
                           setState(() {});
                           Fluttertoast.showToast(
@@ -287,8 +281,7 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                         }
                         if (picked != null) {
                           setState(() {
-                            datePickerController.text =
-                                DateFormat.yMd().format(picked);
+                            datePickerController.text = DateFormat.yMd().format(picked);
                           });
                         }
                       }
@@ -677,16 +670,16 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                       giftFrom = value;
                       print(giftMsg);
                     },
-                    validator: (value) {
-                      bool valid = isEmail(value);
-                      if (valid) {
-                        return null;
-                      } else if (value == null || value.isEmpty) {
-                        return 'Please enter Gift receiver name';
-                      } else {
-                        return "Please enter some text";
-                      }
-                    },
+                    // validator: (value) {
+                    //   bool valid = isEmail(value);
+                    // if (valid) {
+                    //   return null;
+                    // } else if (value == null || value.isEmpty) {
+                    //   return 'Please enter Gift receiver name';
+                    // } else {
+                    //   return "Please enter some text";
+                    // }
+                    // },
                   ),
                 ),
                 Flexible(
@@ -703,16 +696,16 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                       giftMsg = value;
                       print(first);
                     },
-                    validator: (value) {
-                      bool valid = isEmail(value);
-                      if (valid) {
-                        return null;
-                      } else if (value == null || value.isEmpty) {
-                        return 'Please enter some Gift Message name';
-                      } else {
-                        return "Please enter some text";
-                      }
-                    },
+                    // validator: (value) {
+                    //   bool valid = isEmail(value);
+                    //   if (valid) {
+                    //     return null;
+                    //   } else if (value == null || value.isEmpty) {
+                    //     return 'Please enter some Gift Message name';
+                    //   } else {
+                    //     return "Please enter some text";
+                    //   }
+                    // },
                   ),
                 ),
               ],
@@ -753,6 +746,7 @@ class _CreateOrderState extends BasePageState<CreateOrder> {
                                   deliveryTime: dropDownValue,
                                   giftFrom: giftFrom,
                                   giftMsg: giftMsg,
+                                  couponSelection: widget.couponSelection,
                                 )));
                   }
                 }

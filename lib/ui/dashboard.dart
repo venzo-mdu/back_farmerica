@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:banner_carousel/banner_carousel.dart';
+import 'package:farmerica/ui/bundledProductPage.dart';
 import 'package:flutter/material.dart';
 import 'package:farmerica/models/global.dart' as Globals;
 import 'package:farmerica/models/Categories.dart';
@@ -49,6 +51,8 @@ class _DashboardState extends State<Dashboard> {
 
   final PageController _carouselController = PageController(initialPage: 0);
   int _carouselPage = 0;
+  double screenWidth;
+  final double imageIconSize = 25;
 
   getList() {
     setState(() {
@@ -56,29 +60,49 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
+  int bundledId = 3925;
+  List bundledList = [];
+  // Future bundledData() async {
+  //   bundledList = await api_services.getBundled(bundledId);
+  //   print('objectCouponList: ${bundledList.length}');
+  //   print('objectCouponList: ${bundledList[0].code}');
+  //   // print('objectCouponList: ${bundledList[1].code}');
+  //
+  //   // for (int i = 0; i < couponList.length; i++) {
+  //   //   if(couponList[i].dateExpires != null) {
+  //   //     dummyCouponList.add(couponList[i]);
+  //   //   }
+  //   // }
+  // }
+
   String title = "Dashboard";
 
   bool end = false;
+  final ScrollController scrollController = ScrollController();
+  Timer timer;
+
   @override
   void initState() {
-    Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_carouselPage == 2) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+        if (_carouselController.hasClients) {
+          _carouselController.animateToPage(
+            _carouselPage,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeIn,
+          );
+        }
         _carouselPage++;
-        _carouselController.animateToPage(
-          _carouselPage,
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeIn,
-        );
-      } else {
-        _carouselPage--;
-      }
+      });
     });
+
     product = widget.product;
     super.initState();
   }
 
   @override
   void dispose() {
+    timer.cancel();
     _carouselController.dispose();
     super.dispose();
   }
@@ -99,32 +123,9 @@ class _DashboardState extends State<Dashboard> {
 //             Carousal(
 //               MediaQuery.of(context).size.width,
 //             ),
-            ///
-            //   Container(
-            //     height: 250,
-            //     width: double.infinity,
-            //     child: PageView.builder(
-            //         itemCount: carousel.length,
-            //         controller: _carouselController,
-            //         pageSnapping: true,
-            //         itemBuilder: (context, pagePosition){
-            //           return GestureDetector(
-            //             onTap: (){
-            //               _carouselController.animateToPage(pagePosition, curve: Curves.decelerate, duration: const Duration(milliseconds: 100));
-            //             },
-            //             child: Container(
-            //                 margin: const EdgeInsets.all(10),
-            //                 child: Image.network(carousel[pagePosition])),
-            //           );
-            //         }),
-            //   ),
-
-// banner 1
-            ///
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(30))),
+              decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(30))),
               width: double.infinity,
               height: 200,
               child: PageView(
@@ -137,7 +138,6 @@ class _DashboardState extends State<Dashboard> {
                 },
               ),
             ),
-
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Row(
@@ -146,9 +146,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Container(
                       //width: MediaQuery.of(context).size.width * 0.43,
                       height: MediaQuery.of(context).size.height * 0.15,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xffD7F5D8)),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xffD7F5D8)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Column(
@@ -195,9 +193,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Container(
                       //width: MediaQuery.of(context).size.width * 0.43,
                       height: MediaQuery.of(context).size.height * 0.15,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xffF5D7D7)),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xffF5D7D7)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Column(
@@ -251,9 +247,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Container(
                       // width: MediaQuery.of(context).size.width * 0.43,
                       height: MediaQuery.of(context).size.height * 0.15,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xffD7DFF5)),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xffD7DFF5)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Column(
@@ -301,9 +295,7 @@ class _DashboardState extends State<Dashboard> {
                     child: Container(
                       // width: MediaQuery.of(context).size.width * 0.43,
                       height: MediaQuery.of(context).size.height * 0.15,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          color: const Color(0xffEFF5D7)),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xffEFF5D7)),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Column(
@@ -362,32 +354,27 @@ class _DashboardState extends State<Dashboard> {
                     itemBuilder: (context, index) {
                       return GestureDetector(
                           onTap: () async {
-                            if (homeScreen[index].toString() ==
-                                'assets/images/exotic-vegetable-a-gift-basket.jpg') {
+                            if (homeScreen[index].toString() == 'assets/images/exotic-vegetable-a-gift-basket.jpg') {
                               Globals.globalInt = 68;
                               response = await api_services.getProducts(68);
-                              Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) => Grocery(
-                                            product: response,
-                                          )));
-                            } else if (homeScreen[index].toString() ==
-                                'assets/images/healthy-food-from-our-farm-1.jpg') {
+                              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                                  builder: (context) => Grocery(
+                                        product: response,
+                                      )));
+                            } else if (homeScreen[index].toString() == 'assets/images/healthy-food-from-our-farm-1.jpg') {
                               Globals.globalInt = 86;
                               response = await api_services.getProducts(86);
-                              Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) => Grocery(
-                                            product: response,
-                                          )));
+                              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                                  builder: (context) => Grocery(
+                                        product: response,
+                                      )));
                             } else {
                               Globals.globalInt = 45;
                               response = await api_services.getProducts(45);
-                              Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) => Grocery(
-                                            product: response,
-                                          )));
+                              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                                  builder: (context) => Grocery(
+                                        product: response,
+                                      )));
                             }
                           },
                           child: ClipRRect(
@@ -404,40 +391,56 @@ class _DashboardState extends State<Dashboard> {
                       textAlign: TextAlign.center,
                       text: const TextSpan(
                           text: 'Best Sellers Products\n\n',
-                          style: TextStyle(
-                              fontFamily: 'OutFit',
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: 24),
+                          style: TextStyle(fontFamily: 'OutFit', fontWeight: FontWeight.w500, color: Colors.black, fontSize: 24),
                           children: <TextSpan>[
                             TextSpan(
                                 text:
                                     'Hand-crafted with care and attention to packaging detail makes our gift packs best seller and perfect for any occasion. Send them as a thanks or congratulations gift, our gifts are sure to please.',
-                                style: TextStyle(
-                                    fontFamily: 'OutFit',
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 18))
+                                style: TextStyle(fontFamily: 'OutFit', fontWeight: FontWeight.w300, fontSize: 18))
                           ])),
                   Center(
-                    heightFactor: 3.0,
+                    heightFactor: 2.0,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff00ab55),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                         textStyle: const TextStyle(
                           fontSize: 18,
                         ),
                       ),
                       onPressed: () async {
                         response = await api_services.getProducts(86);
-                        Navigator.of(context, rootNavigator: true)
-                            .push(MaterialPageRoute(
-                                builder: (context) => Grocery(
-                                      product: response,
-                                    )));
+                        Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                            builder: (context) => Grocery(
+                                  product: response,
+                                )));
                       },
                       child: const Text('View More'),
+                    ),
+                  ),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: const TextSpan(
+                        text: 'Customise Fruits Basket\n\n',
+                        style: TextStyle(fontFamily: 'OutFit', fontWeight: FontWeight.w500, color: Colors.black, fontSize: 24),
+                        children: <TextSpan>[
+                          TextSpan(text: 'Best quality fruits to create a unique combination for your gift basket', style: TextStyle(fontFamily: 'OutFit', fontWeight: FontWeight.w300, fontSize: 18))
+                        ]),
+                  ),
+                  Center(
+                    heightFactor: 2.0,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xff00ab55),
+                        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => BundledProductPage(productId: 3925)));
+                      },
+                      child: const Text('Bundled Products'),
                     ),
                   )
                 ],

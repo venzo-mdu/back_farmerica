@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:farmerica/models/CartRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:farmerica/Config.dart';
 import 'package:farmerica/models/Customers.dart';
@@ -55,6 +56,8 @@ class _CashOnDeliveryState extends State<CashOnDelivery> {
     return orderList;
   }
 
+  List<CartProducts> cartProducts = [];
+
   @override
   void initState() {
     getValidation().then((value) => setState(() {
@@ -72,11 +75,11 @@ class _CashOnDeliveryState extends State<CashOnDelivery> {
     // });
 
     if (orderList == null) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     } else {
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xff00ab55),
+          backgroundColor: const Color(0xff00ab55),
           title: Image.network(
             'https://www.farmerica.in/wp-content/uploads/2023/01/farmerica-logo.png',
             color: Colors.white,
@@ -88,22 +91,21 @@ class _CashOnDeliveryState extends State<CashOnDelivery> {
               children: [
                 Container(
                     width: double.infinity,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 140, vertical: 25),
-                    child: Text(
+                    padding: const EdgeInsets.symmetric(horizontal: 140, vertical: 25),
+                    child: const Text(
                       'Thank You!!',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     )),
-                Text(
+                const Text(
                   'Your order is Placed!',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Container(
                   width: double.infinity,
                   height: 180,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
+                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  decoration: const BoxDecoration(
                     color: Color(0XFFF0F0F1),
                   ),
                   child: Column(
@@ -116,33 +118,33 @@ class _CashOnDeliveryState extends State<CashOnDelivery> {
                             var orderIds;
                             if (snapshot.hasData) {
                               orderIds = snapshot.data[0].id;
-                              print(snapshot.data[0].id);
+                              print('orderId: ${snapshot.data[0].id}');
                             }
                             return Text('Order number: ${orderIds.toString()}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.w500));
                           }),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Text('Date : ${widget.delivery_type}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500)),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Text('Total: ${widget.cartProducts[0].price}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500)),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Text('Gift From: ${widget.gift_from.toString()}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500)),
-                      SizedBox(width: 25),
+                      const SizedBox(width: 25),
                       Text('Gift Msg: ${widget.gift_message.toString()}',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.w500)),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
 
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -150,13 +152,15 @@ class _CashOnDeliveryState extends State<CashOnDelivery> {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
+                      cartProducts.remove(0);
+                      
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(builder: (context) => BasePage(
                             customer: loginDetails,
                             title: "Farmerica App",
                           )), (route) => false);
                     },
-                    child: Text('Continue Shopping')),
+                    child: const Text('Continue Shopping')),
 
                 // Container(
                 //   width: double.infinity,

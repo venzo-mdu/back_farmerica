@@ -47,7 +47,7 @@ class WooCommerceAPI {
     var token = "";
     var url = this.url + endpoint;
     var containsQueryParams = url.contains("?");
-    print('getURL: $url');
+    // print('getURL: $url');
 
     // If website is HTTPS based, no need for OAuth, just return the URL with CS and CK as query params
     if (this.isHttps == true) {
@@ -146,14 +146,8 @@ class WooCommerceAPI {
 
   Future<dynamic> getAsync(String endPoint, {Map data}) async {
 
-    // print('endPoint: $endPoint');
-    // print('endPointData: ${data}');
     var url = this.getOAuthURL("GET", endPoint);
-    // print('getAsync: $url');
-    // print(url);
     final response = await http.get(Uri.parse(url));
-    // print('responseBody');
-    // print(response.body);
     return json.decode(response.body);
   }
 

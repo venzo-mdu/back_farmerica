@@ -45,6 +45,9 @@ dependencies:
   oauth1: any
 
   email_validator: any
+  banner_carousel: any
+  number_inc_dec: any
+  badges: any
 
   flutter_search_bar: any
   flutter_svg: any

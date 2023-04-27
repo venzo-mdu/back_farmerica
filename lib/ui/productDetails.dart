@@ -1,10 +1,12 @@
 import 'dart:ui';
 import 'package:farmerica/models/Customers.dart';
+import 'package:farmerica/ui/BasePage.dart';
 import 'package:flutter/material.dart';
 import 'package:farmerica/Providers/CartProviders.dart';
 import 'package:farmerica/models/Products.dart' as p;
 import 'package:farmerica/models/Products.dart';
 import 'package:farmerica/ui/CartPage.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:html/parser.dart';
@@ -238,7 +240,7 @@ class _ProductDetailState extends State<ProductDetail> {
                 Text(loa ? "" : shortDes, style: normalText),
                 const SizedBox(height: 10),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     const Text(
                       'Delivery Check',
@@ -250,91 +252,97 @@ class _ProductDetailState extends State<ProductDetail> {
                     ),
                     // SizedBox(width: 10),
                     SizedBox(
-                      width: 80,
-                      child: Autocomplete(
-                        optionsBuilder: (textEditingValue) {
-                          if (textEditingValue.text == '') {
-                            setState(() {
-                              flag = false;
-                              errorMsg = true;
-                            });
-                            if(textEditingValue.text != pinCodes) {
-                              setState(() {
-                                errorMsg = false;
-                              });
-                            }
-                            return const Iterable.empty();
-                          }
-
-                          return pinCodes.where((element) {
-                            return element.contains(textEditingValue.text);
-                          });
-                        },
-                        onSelected: (value) async {
-                          pinCodePrefs = await SharedPreferences.getInstance();
-                          pinCodePrefs.setString('pinCode', value);
-
-                          setState(() {
-                            flag = true;
-                            errorMsg = false;
-                          });
-
-                          print('the $value was selected');
-                          print('pinCodePrefs: ${pinCodePrefs.toString()}');
-                        },
-                      ),
-                      // child: TextFormField(
-                      //   // initialValue: 'hi' ?? pinCodePrefs.getString('pinCode'),
-                      //   controller: pincodeController,
-                      //   keyboardType: TextInputType.number,
-                      //   decoration: InputDecoration(
-                      //     hintText: "Postcode / ZIP",
-                      //     border: OutlineInputBorder(
-                      //         borderRadius:
-                      //         BorderRadius.all(Radius.circular(0))),
-                      //   ),
-                      //   validator: (String value){},
+                      width: MediaQuery.of(context).size.width * .4,
+                      // child: Autocomplete(
+                      //   optionsBuilder: (textEditingValue) {
+                      //     if (textEditingValue.text == '') {
+                      //       setState(() {
+                      //         flag = false;
+                      //         errorMsg = true;
+                      //       });
+                      //       if(textEditingValue.text != pinCodes) {
+                      //         setState(() {
+                      //           errorMsg = false;
+                      //         });
+                      //       }
+                      //       return const Iterable.empty();
+                      //     }
+                      //
+                      //     return pinCodes.where((element) {
+                      //       return element.contains(textEditingValue.text);
+                      //     });
+                      //   },
+                      //   onSelected: (value) async {
+                      //     pinCodePrefs = await SharedPreferences.getInstance();
+                      //     pinCodePrefs.setString('pinCode', value);
+                      //
+                      //     setState(() {
+                      //       flag = true;
+                      //       errorMsg = false;
+                      //     });
+                      //
+                      //     print('the $value was selected');
+                      //     print('pinCodePrefs: ${pinCodePrefs.toString()}');
+                      //   },
                       // ),
+                      ///
+                      child: TextFormField(
+                        // initialValue: 'hi' ?? pinCodePrefs.getString('pinCode'),
+                        controller: pincodeController,
+                        onSaved: (value) {
+                          value = pincodeController.text;
+                        },
+                        keyboardType: TextInputType.number,
+                        autofillHints: const [AutofillHints.postalCode],
+                        decoration: const InputDecoration(
+                          hintText: "Postcode / ZIP",
+                          border: OutlineInputBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(0))),
+                        ),
+                        validator: (value){},
+                      ),
                     ),
-
-                    // ElevatedButton(
-                    //   style: ElevatedButton.styleFrom(
-                    //     backgroundColor: Color(0xffffb240),
-                    //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    //     textStyle:
-                    //     TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    //   ),
-                    //   onPressed: () async {
-                    //     // pinCodePrefs = await SharedPreferences.getInstance();
-                    //     // pinCodePrefs.setString('pinCode', pincodeController.text);
-                    //
-                    //
-                    //     bool found = pinCodes.contains(pincodeController.text);
-                    //     if(found) {
-                    //       print('Same');
-                    //       setState(() {
-                    //         flag = true;
-                    //         flags = false;
-                    //         // print('shippingVisibility: $shippingVisibility');
-                    //       });
-                    //     } else {
-                    //       setState(() {
-                    //         flag = false;
-                    //         flags = false;
-                    //         // print('shippingVisibility: $shippingVisibility');
-                    //       });
-                    //     }
-                    //   },
-                    //   // color: product.color,
-                    //   child: Text(
-                    //     "CHECK",
-                    //     style: TextStyle(
-                    //         fontSize: 15,
-                    //
-                    //     ),
-                    //   ),
-                    // ),
                   ],
+                ),
+                Center(
+                  heightFactor: 2,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xffffb240),
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () async {
+                      // pinCodePrefs = await SharedPreferences.getInstance();
+                      // pinCodePrefs.setString('pinCode', pincodeController.text);
+
+                      TextInput.finishAutofillContext();
+                      bool found = pinCodes.contains(pincodeController.text);
+                      if(found) {
+                        print('Same');
+                        setState(() {
+                          flag = true;
+                          errorMsg = false;
+                          // print('shippingVisibility: $shippingVisibility');
+                        });
+                      } else {
+                        setState(() {
+                          flag = false;
+                          errorMsg = false;
+                          // print('shippingVisibility: $shippingVisibility');
+                        });
+                      }
+                    },
+                    // color: product.color,
+                    child: const Text(
+                      "CHECK",
+                      style: TextStyle(
+                        fontSize: 15,
+
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 flag
@@ -372,7 +380,8 @@ class _ProductDetailState extends State<ProductDetail> {
                                         1,
                                         widget.product.name,
                                         widget.product.price,
-                                        widget.product.images[0].src);
+                                        widget.product.images[0].src,
+                                );
                                 Fluttertoast.showToast(
                                   msg:
                                       "${widget.product.name} successfully added to cart",
@@ -387,6 +396,17 @@ class _ProductDetailState extends State<ProductDetail> {
                                 //     builder: (context) => CartScreen(
                                 //         product: response,
                                 //         details: widget.customer,
+                                //       fromMainPage: false,
+                                //         )));
+                                Navigator.pushAndRemoveUntil(context,
+                                    MaterialPageRoute(builder: (context) => BasePage(selected:2)), (route) => false);
+
+                                // Navigator.pushReplacement(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => BasePage(
+                                //           title: "Farmerica App",
+                                //           customer: customer,
                                 //         )));
                               },
                               // color: product.color,
@@ -399,7 +419,7 @@ class _ProductDetailState extends State<ProductDetail> {
                         ),
                       )
                     : Center(
-                        child: errorMsg
+                        child: pincodeController.text.isEmpty
                             ? Container(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 20),
@@ -430,6 +450,7 @@ class _ProductDetailState extends State<ProductDetail> {
         ],
       ),
     );
+
   }
 
   AppBar buildAppBar() {

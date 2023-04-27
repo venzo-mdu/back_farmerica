@@ -133,7 +133,7 @@ class Orders {
     if (json['line_items'] != null) {
       lineItems = <LineItems>[];
       json['line_items'].forEach((v) {
-        lineItems.add(new LineItems.fromJson(v));
+        lineItems.add(LineItems.fromJson(v));
       });
     }
     if (json['tax_lines'] != null) {
@@ -355,7 +355,7 @@ class LineItems {
   List<Taxes> taxes;
   List<MetaData> metaData;
   String sku;
-  int price;
+  var price;
 
   LineItems(
       {this.id,

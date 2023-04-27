@@ -13,6 +13,7 @@ import 'package:farmerica/ui/homepage.dart';
 import 'package:farmerica/ui/success.dart';
 import 'package:farmerica/ui/widgets/cashondelivery.dart';
 import 'package:farmerica/utils/RazorPaymentService.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upi_india/upi_india.dart';
 import 'package:farmerica/utils/RazorPaymentService.dart';
 
@@ -33,6 +34,7 @@ class PaymentGateway extends BasePage {
   var shippingMode;
   final String deliveryDate;
   final String deliveryTime;
+  String couponSelection;
 
   final int id;
   List product = [];
@@ -56,26 +58,30 @@ class PaymentGateway extends BasePage {
       this.deliveryTime,
       this.giftFrom,
       this.giftMsg,
-      this.shippingMode});
+      this.shippingMode,
+      this.couponSelection,
+      });
 
   @override
   _PaymentGatewayState createState() => _PaymentGatewayState();
 }
 
 class _PaymentGatewayState extends BasePageState<PaymentGateway> {
-  // UpiIndia _upiIndia = UpiIndia();
-  // List<UpiApp> apps;
-  // bool setPaid;
-  // String title, method;
-  // Api_Services api_services = Api_Services();
-  // RazorPaymentService razorPaymentService = RazorPaymentService();
-  // UpiApp _selectedApp;
+
+  String showCoupon;
+  getCoupon() async {
+    SharedPreferences couponPrefs = await SharedPreferences.getInstance();
+    setState(() {
+      showCoupon = couponPrefs.getString('pinCode') ?? '';
+    });
+  }
 
   @override
-  void dispose() {
-    // razorPaymentService.clears();
-    super.dispose();
+  void initState() {
+    getCoupon();
+    super.initState();
   }
+
   Future<Orders> createOrder() async {
     final orders = await api_services.createOrder(
 
@@ -89,42 +95,30 @@ class _PaymentGatewayState extends BasePageState<PaymentGateway> {
       phone: widget.mobile,
       postcode: widget.postcode,
       state: widget.state,
-      // total: '1000',
       payment_method_title: 'Cash on Delivery',
-      payment_method: 'Pay after recieving',
-      // quantity: widget.cartProducts[0].quantity,    //orderData.orders[0].products[0].quantity,
-      // product_id: widget.cartProducts[0].product_id,    //orderData.orders[0].products[0].id,
+      payment_method: 'Pay after receiving',
       delivery_type: widget.deliveryDate,
       delivery_time: widget.deliveryTime,
       gift_from: widget.giftFrom,
       gift_message: widget.giftMsg,
       cartProducts: widget.cartProducts,
 
+      coupon: widget.couponSelection,
+      // coupon_lines: [widget.couponSelection, widget.couponTotal],
 
-      // delivery_type: widget.deliveryDate,
-      // delivery_time: widget.deliveryTime,
-      // gift_from: widget.giftFrom,
-      // gift_message: widget.giftMsg,
+      // couponSelection: [widget.couponSelection, widget.couponSelection, widget.couponTotal],
+      // couponDiscount: widget.couponDiscount,
+      // couponTotal: widget.couponTotal,
+
     );
-
 
     print('cartDataQty: ${widget.cartProducts[0].quantity}');
     print('cartDate: ${widget.cartProducts[0].product_id}');
   }
 
   @override
-  void initState() {
-    // razorPaymentService.initPaymentGateway(context);
-    // _upiIndia = UpiIndia();
-    // // _initiatePayment();
-    // _upiIndia.getAllUpiApps(mandatoryTransactionId: false).then((value) {
-    //   setState(() {
-    //     apps = value;
-    //   });
-    // }).catchError((e) {
-    //   apps = [];
-    // });
-    super.initState();
+  void dispose() {
+    super.dispose();
   }
 
   // Future<void> _initiatePayment() async {
@@ -271,7 +265,7 @@ class _PaymentGatewayState extends BasePageState<PaymentGateway> {
       //       setState(() {});
       //     }));
       ///
-      cards.add(new PayCard(
+      cards.add(PayCard(
           title: "Cash on Delivery",
           description: "via Cash on delivery",
           image: "assets/paycard.png",
@@ -279,8 +273,6 @@ class _PaymentGatewayState extends BasePageState<PaymentGateway> {
           // Create order - POST
           onPressed: () {
 
-            print('object: ${widget.giftMsg}');
-            print('object: ${widget.giftFrom}');
 
             createOrder();
 

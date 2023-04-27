@@ -57,7 +57,7 @@ class _GridViewListState extends State<GridViewList> {
                         child: Container(
                           width: MediaQuery.of(context).size.width - 40,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                   bottomRight: Radius.circular(15),
                                   bottomLeft: Radius.circular(15)),
                               color: Colors.white.withOpacity(0.75)),
@@ -75,16 +75,43 @@ class _GridViewListState extends State<GridViewList> {
                                       fontSize: width * 0.045,
                                       color: Colors.black),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                  "₹" + widget.product[id].price,
+                                  "₹${widget.product[id].price}",
                                   style: TextStyle(
                                       fontFamily: 'OutFit',
                                       fontWeight: FontWeight.w600,
                                       fontSize: width * 0.05,
-                                      color: Color(0xff3a9046)),
+                                      color: const Color(0xff3a9046)),
+                                ),
+
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      addtoCart = 1;
+                                    });
+                                    Provider.of<CartModel>(context,
+                                        listen: false)
+                                        .addCartProduct(
+                                        widget.product[id].id,
+                                        1,
+                                        widget.product[id].name,
+                                        widget.product[id].price,
+                                        widget.product[id].images[0].src);
+                                    // .addCartProduct(widget.product);
+                                    Fluttertoast.showToast(
+                                        msg:
+                                        "${widget.product[id].name} successfully added to cart",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.black,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                  },
+                                  child: const Text("add to cart"),
                                 ),
                               ],
                             ),

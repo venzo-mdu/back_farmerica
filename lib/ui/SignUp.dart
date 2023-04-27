@@ -1,3 +1,4 @@
+import 'package:farmerica/ui/Welcome.dart';
 import 'package:farmerica/ui/widgets/input_outline_button.dart';
 import 'package:farmerica/ui/widgets/input_text_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -194,7 +195,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 InputOutlineButton(
                   title: "Back",
                   onClick: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => WelcomePage()));
                   },
                 ),
                 const Spacer(

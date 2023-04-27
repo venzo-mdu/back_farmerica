@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:farmerica/models/Customers.dart';
 import 'package:farmerica/models/ParentCategory.dart';
@@ -18,6 +19,7 @@ class BasePage extends StatefulWidget {
   BasePage({
     this.customer,
     this.title,
+    this.selected,
   });
 
   @override
@@ -51,6 +53,7 @@ class BasePageState<T extends BasePage> extends State<T> {
         CartScreen(
           product: response,
           details: widget.customer,
+          fromMainPage: true,
         ),
         CompleteProfileScreen(
           customer: widget.customer,
@@ -66,13 +69,12 @@ class BasePageState<T extends BasePage> extends State<T> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff00ab55),
         centerTitle: true,
-        title: Image.network(
-          'https://www.farmerica.in/wp-content/uploads/2023/01/farmerica-logo.png',
+        title: Image.asset(
+          'assets/farmerica-logo.png',
           color: Colors.white,
         ),
       ),
@@ -88,24 +90,31 @@ class BasePageState<T extends BasePage> extends State<T> {
             selected = inx;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
               icon: Icon(
                 Icons.home,
               ),
               label: "Home"),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
               icon: Icon(
                 Icons.category_rounded,
               ),
               label: "Category"),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.shopping_cart,
+            icon: Badge(
+              badgeContent: Text(
+                Globals.cartCount == null ? '0' : '${Globals.cartCount}',
+                style: const TextStyle(color: Colors.white, fontSize: 15),
+              ),
+              badgeStyle: const BadgeStyle(badgeColor: Colors.red),
+              child: const Icon(
+                Icons.shopping_cart,
+              ),
             ),
             label: "My Cart",
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
             ),
@@ -130,6 +139,7 @@ class BasePageState<T extends BasePage> extends State<T> {
       CartScreen(
         product: response,
         details: widget.customer,
+        fromMainPage: true,
       ),
       CompleteProfileScreen(
         customer: widget.customer,
